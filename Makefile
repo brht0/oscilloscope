@@ -1,6 +1,6 @@
 SRC := $(wildcard *.cpp)
 OBJS := $(SRC:%.cpp=obj/%.o)
-FLAGS := -std=c++17 -lglfw -lGL -O3 -MMD
+FLAGS := -std=c++17 -lglfw -lGL -MMD #-O3
 
 .PHONY: all
 all: | build
@@ -13,8 +13,8 @@ obj_folder:
 	mkdir -p obj/
 
 build: obj_folder $(OBJS)
-	$(CXX) $(FLAGS) obj/*.o -o out
+	$(CXX) -o out obj/*.o $(FLAGS)
 
 -include $(OBJS:.o=.d)
 obj/%.o: %.cpp
-	$(CXX) $(FLAGS) -c $< -o $@
+	$(CXX) -c $< -o $@ $(FLAGS)

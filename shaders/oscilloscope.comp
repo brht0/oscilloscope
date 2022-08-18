@@ -21,11 +21,11 @@ void drawline(int x1, int y1, int x2, int y2, vec4 color){
     if(x2 < x1){ int temp = x2; x2 = x1; x2 = temp; }
     if(y2 < y1){ int temp = y2; y2 = y1; y2 = temp; }
 
-    const float k = 1.0;
+    const float k = 0.2;
     int dx = x2 - x1;
     int dy = y2 - y1;
 
-    color = color * max(0.0, k - (0.05*length(vec2(dx, dy))));
+    color = k * color * (1.0 / (0.1*length(vec2(dx, dy)) + 0.3));
 
     x1 = min(x1, x2);
     y1 = min(y1, y2);

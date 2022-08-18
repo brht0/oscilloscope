@@ -18,6 +18,11 @@ git clone git@github.com:brht0/oscilloscope.git && cd oscilloscope
 make
 ./oscilloscope <path_to_song>
 ```
+
+### Example (Song used "Jerobeam Fenderson - Shrooms")
+
+![Shrooms](screenshots/Jerobeam_Fenderson_Shrooms.gif)
+
 ### Todo:
 - Some code (e.g. ComputeProgramStack) are loose copy/pastes with some modifications from my other projects, should be simplified
 - OpenAL errors

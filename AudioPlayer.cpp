@@ -39,7 +39,9 @@ void AudioPlayer::SetFile(SoundFile* file) {
 }
 
 void AudioPlayer::SetTime(float time) {
+    alSourcePause(source);
     alSourcef(source, AL_SEC_OFFSET, time);
+    alSourcePlay(source);
 }
 
 float AudioPlayer::GetTime() {

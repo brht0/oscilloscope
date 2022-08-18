@@ -42,6 +42,7 @@ void App::LoadSoundFile(const char* filename) {
     // Audio player
     player.SetFile(soundfile);
     player.TogglePause();
+    player.SetTime(198.0);
 }
 
 void App::Render() {

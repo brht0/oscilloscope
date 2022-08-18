@@ -1,0 +1,75 @@
+#version 430
+
+layout(local_size_x = 16, local_size_y = 1, local_size_z = 1) in;
+layout(rgba32f, binding=0) uniform image2D screen;
+
+layout(std430, binding=0) buffer amplitudeData{
+    float amplitudes[];
+};
+
+uniform int screenW;
+uniform int screenH;
+
+uniform int channels;
+uniform int samplerate;
+
+uniform float time;
+
+void drawline(int x1, int y1, int x2, int y2, vec4 color){
+    int i = int(gl_LocalInvocationID.x);
+
+    if(x2 < x1){ int temp = x2; x2 = x1; x2 = temp; }
+    if(y2 < y1){ int temp = y2; y2 = y1; y2 = temp; }
+
+    const float k = 1.0;
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+
+    color = color * max(0.0, k - (0.05*length(vec2(dx, dy))));
+
+    x1 = min(x1, x2);
+    y1 = min(y1, y2);
+
+    if(abs(dx) >= abs(dy)){
+        double slope = double(dy) / double(dx+0.0001);
+
+        for(int x=x1+i; x<=clamp(x1+abs(dx), 0, screenW-1); x+=int(gl_WorkGroupSize.x)){
+            int y = y1 + int((x - x1) * slope);
+
+            imageStore(screen, ivec2(x, y), color + imageLoad(screen, ivec2(x, y)));
+        }
+    }
+    else{
+        double islope = double(dx) / double(dy+0.0001);
+        for(int y=y1+i; y<=clamp(y1+abs(dy), 0, screenH-1); y+=int(gl_WorkGroupSize.x)){
+            int x = x1 + int(float(y - y1) * islope);
+
+            imageStore(screen, ivec2(x, y), color + imageLoad(screen, ivec2(x, y)));
+        }
+    }
+}
+
+void main(){
+    int index = int(gl_WorkGroupID.x);
+
+    if(channels*index > amplitudes.length() - 1 - channels * 5){
+        return;
+    }
+
+    const float k = 0.3;
+
+    index += int(time * samplerate);
+
+    // I did it this way because I can
+    int y0 = int((amplitudes[channels * (index  )+1] * k + 0.5) * float(screenW));
+    int x0 = int((amplitudes[channels * (index  )+0] * k + 0.5) * float(screenW));
+    int y1 = int((amplitudes[channels * (index+1)+1] * k + 0.5) * float(screenW));
+    int x1 = int((amplitudes[channels * (index+1)+0] * k + 0.5) * float(screenW));
+    int y2 = int((amplitudes[channels * (index+2)+1] * k + 0.5) * float(screenW));
+    int x2 = int((amplitudes[channels * (index+2)+0] * k + 0.5) * float(screenW));
+
+    vec4 green = vec4(0.0, 1.0, 0.0, 1.0);
+
+    drawline(x0, y0, x1, y1, green);
+    drawline(x0, y0, x2, y2, green);
+}

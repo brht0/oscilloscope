@@ -17,68 +17,19 @@ void ComputeProgramStack::BindUniforms(unsigned program) {
     }
 }
 
-void ComputeProgramStack::RenderImgui() {
-    // ImGui_ImplOpenGL3_NewFrame();
-    // ImGui_ImplGlfw_NewFrame();
-    // ImGui::NewFrame();
-    // ImGui::Begin("uniforms");
-    //     for(auto&[key, uniform] : int_uniforms){
-    //         if(uniform.showImgui){
-    //             ImGui::SliderInt(key.c_str(), &uniform.value, uniform.sliderstart, uniform.sliderend);
-    //         }
-    //     }
-    //     for(auto&[key, uniform] : float_uniforms){
-    //         if(uniform.showImgui){
-    //             ImGui::SliderFloat(key.c_str(), &uniform.value, uniform.sliderstart, uniform.sliderend);
-    //         }
-    //     }
-    // ImGui::End();
-    // ImGui::Render();
-    // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
 void ComputeProgramStack::SetFloat(std::string key, float value) {
-    if(float_uniforms.find(key) == float_uniforms.end()){
-        AddFloat(key, value, 0.0, 1.0, true);
-    }
-    else{
-        float_uniforms[key].value = value;
-    }
+    float_uniforms[key].value = value;
 }
 
 void ComputeProgramStack::SetInt(std::string key, int value) {
-    if(int_uniforms.find(key) == int_uniforms.end()){
-        AddInt(key, value, 0, 10, true);
-    }
-    else{
-        int_uniforms[key].value = value;
-    }
+    int_uniforms[key].value = value;
 }
 
 ComputeProgramStack::ComputeProgramStack() {
-    
 }
 
 ComputeProgramStack::~ComputeProgramStack() {
-    
-}
-
-void ComputeProgramStack::AddFloat(std::string key, float value, float sliderstart, float sliderEnd, bool show) {
-    UniformFloat uniform;
-    uniform.value = value;
-    uniform.sliderstart = sliderstart;
-    uniform.sliderend = sliderEnd;
-    uniform.showImgui = show;
-    float_uniforms[key] = uniform;
-}
-
-void ComputeProgramStack::AddInt(std::string key, int value, int sliderstart, int sliderEnd, bool show) {
-    UniformInt uniform;
-    uniform.value = value;
-    uniform.sliderstart = sliderstart;
-    uniform.sliderend = sliderEnd;
-    uniform.showImgui = show;
-    int_uniforms[key] = uniform;
+    // todo
 }
 
 unsigned ComputeProgramStack::CreateSSBO(std::string key, int base){
@@ -148,4 +99,12 @@ void ComputeProgramStack::AddTexture(std::string key, unsigned texture, int bind
     obj.key = key;
     obj.binding = binding;
     textures.emplace(texture, obj);
+}
+
+float ComputeProgramStack::GetFloat(std::string key) {
+    return float_uniforms[key].value;
+}
+
+int ComputeProgramStack::GetInt(std::string key) {
+    return int_uniforms[key].value;
 }

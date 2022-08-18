@@ -1,5 +1,9 @@
 #include "GLWrapper.hpp"
 
+#include "alhelpers.h"
+#include "Shader.hpp"
+#include "Utils.hpp"
+
 #include <iostream>
 
 GL* GL::get() {
@@ -8,18 +12,23 @@ GL* GL::get() {
 }
 
 GL::GL() {
-    InitializeGLFW();
 }
 
 GL::~GL() {
+    initialized = false;
+
+    UninitializeAL();
     UninitializeGLFW();
 }
 
-GLFWwindow* GL::CreateWindow(const char* title, int width, int height) {
-    if(window){
-        std::cout << "GL: Could not create window. Window already created.\n";
+GLFWwindow* GL::Init(const char* title, int width, int height) {
+    if(initialized){
+        std::cout << "GL: Could not create initialize.\n";
         return window;
     }
+
+    // OpenGL and window
+    InitializeGLFW();
 
     window = glfwCreateWindow(width, height, title, nullptr, nullptr);
     glfwMakeContextCurrent(window);
@@ -29,6 +38,9 @@ GLFWwindow* GL::CreateWindow(const char* title, int width, int height) {
 
     CreateDefaultPrograms();
     CreateDefaultVAO();
+
+    // OpenAL
+    InitializeAL();
 
     return window;
 }
@@ -42,13 +54,19 @@ void GL::InitializeGLFW() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
-void GL::UninitializeGLFW(){
-    std::cout << "GL: Uninitializing OpenGL\n";
-    // todo 
+void GL::InitializeAL() {
+    InitAL(nullptr, nullptr);
 }
 
-bool GL::ShouldQuit() {
-    return window ? glfwWindowShouldClose(window) : true;
+void GL::UninitializeGLFW(){
+    std::cout << "GL: Uninitializing GLFW\n";
+    // todo
+
+}
+
+void GL::UninitializeAL() {
+    // todo
+    
 }
 
 unsigned GL::CreateTexture(int width, int height, int format) {
@@ -71,19 +89,16 @@ unsigned GL::CreateTexture(int width, int height, int format) {
     return texture;    
 }
 
-#include "Shader.hpp"
-#include "Utils.hpp"
-
 void GL::CreateDefaultPrograms() {
-    const char* const program_texture_to_screen_frag_filename = "texture_to_screen.frag";
-    const char* const program_texture_to_screen_vert_filename = "texture_to_screen.vert";
+    const char* const program_texture_to_screen_frag_filename = "shaders/texture_to_screen.frag";
+    const char* const program_texture_to_screen_vert_filename = "shaders/texture_to_screen.vert";
 
     program_texture_to_screen = CreateShader(
         LoadFile(program_texture_to_screen_vert_filename),
         LoadFile(program_texture_to_screen_frag_filename), "program_texture_to_screen");
 }
 
-GLFWwindow* GL::Window() const {
+GLFWwindow* GL::GetWindow() const {
     return window;    
 }
 
